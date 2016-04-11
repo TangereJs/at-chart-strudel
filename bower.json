@@ -1,0 +1,11 @@
+{
+  "name": "at-chart-strudel",
+  "version": "1.0.0.0",
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#master",
+    "d3-elements": "TangereJs/d3-elements#master",
+    "c3": "TangereJs/c3#master",
+    "d3": "TangereJs/d3#master"
+  }
+}

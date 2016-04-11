@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>at-chart-strudel demo</title>
+    <script src="../webcomponentsjs/webcomponents-lite.js" charset="utf-8"></script>
+    <link rel="import" href="../polymer/polymer.html">
+    <link rel="import" href="at-chart-strudel.html">
+    <style media="screen">
+      .content-container {
+        margin: 0 10px;
+        width: 50%;
+      }
+
+      .header {
+        margin: 10px 0;
+      }
+
+      .demo-container {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content-container">
+      <div class="header">
+        <h4>at-chart-strudel demo</h4>
+      </div>
+      <div class="demo-container">
+        <at-chart-strudel>
+          { "columns": [ ["Taken", 6], ["Planned", 2], ["Open", 2] ]}
+        </at-chart-strudel>
+      </div>
+      <div class="demo-container">
+        <at-chart-strudel>
+          { "columns": [ ["Taken", 10], ["Planned", 12], ["Open", 17] ]}
+        </at-chart-strudel>
+      </div>
+      <div class="demo-container">
+        <at-chart-strudel>
+          { "columns": [ ["Taken", 19], ["Planned", 13], ["Open", 11] ] }
+        </at-chart-strudel>
+      </div>
+    </div>
+  </body>
+</html>

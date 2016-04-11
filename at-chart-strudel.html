@@ -1,0 +1,189 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../d3-elements/d3-import.html">
+
+<dom-module id="at-chart-strudel">
+  <template>
+    <style>
+      table {
+        width: 100%;
+      }
+
+      td {
+        background-color: beige;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      .legend-container {
+        text-align: center;
+      }
+
+      .legend .entry {
+        display: inline-block;
+        margin-right: 8px;
+      }
+
+      .legend .color {
+        width: 12px;
+        height: 12px;
+        background-color: beige;
+        display: inline-block;
+        margin-right: 4px;
+      }
+    </style>
+    <div class="">
+      <table>
+        <tr id="insertPoint">
+
+        </tr>
+      </table>
+      <div class="legend-container">
+        <div id="legend" class="legend">
+
+        </div>
+      </div>
+      <div id="dataContent" style="display:none">
+        <content></content>
+      </div>
+    </div>
+  </template>
+  <script>
+    'use strict';
+    Polymer({
+      is: 'at-chart-strudel',
+      properties: {
+        /**
+         * @property colorScheme
+         * selects a color scheme to be used
+         */
+        colorScheme: {
+          type: String,
+          value: 'category10',
+          title: 'Color scheme',
+          observer: 'colorSchemeChanged',          
+          xtype: 'enum',
+          xvaluelist: 'category10,category20,category20b,category20c,google10c,google20c'
+        },
+        data: {
+          type: Object,
+          value: function() {
+            return { "columns": [ ["Taken", 6], ["Planned", 2], ["Open", 2] ]};
+          }
+        }
+      },
+      observers: [
+        '_initialize(data, colorScheme)'
+      ],
+      _supported_color_schemes: {
+        category10: d3.scale.category10(),
+        category20: d3.scale.category20(),
+        category20b: d3.scale.category20b(),
+        category20c: d3.scale.category20c(),
+        google10c: function(n) {
+          var colors_g = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6",
+            "#3b3eac"
+          ];
+          return colors_g[n % colors_g.length];
+        },
+        google20c: function(n) {
+          var colors_g = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6",
+            "#3b3eac"
+          ];
+          return colors_g[n % colors_g.length];
+        }
+      },
+      ready: function() {
+        // get sample data
+        var txt = this.shadowRoot ? this.innerHTML.trim() : this.$.dataContent.innerHTML.trim();
+
+        if (txt) {
+          var json = null;
+
+          try {
+            json = JSON.parse(txt);
+          } catch (err) {
+            var msg = document.createElement("div");
+            msg.innerHTML = "<br>Error: " + err.message + "<br>";
+            this.appendChild(msg);
+          }
+        }
+        // this assignment will trigger this._initialize();
+        this.data = json;
+      },
+      colorSchemeChanged: function (newValue, oldValue) {
+
+      },
+      _initialize: function(data, colorScheme) {
+        if (this._isString(data)) {
+          try {
+            data = JSON.parse(data);
+          } catch (e) {}
+        }
+
+        if (!data || !data.columns || !this._isArray(data.columns)) {
+          return;
+        }
+        if (!this._supported_color_schemes.hasOwnProperty(colorScheme)) {
+          return;
+        }
+
+        var insertPoint = Polymer.dom(this.$.insertPoint);
+        var legend = Polymer.dom(this.$.legend);
+        insertPoint.innerHTML = "";
+        legend.innerHTML = "";
+
+        var total = 0;
+        data.columns.forEach(function (column, index) {
+          // each column is array of ["<name>", <value>]
+          if (column.length === 2) {
+            var name = column[0];
+            var value = column[1];
+            total += value;
+          } else {
+            // ignore this entry as its incomplete
+          }
+        });
+        var baseWidth = 100/total;
+        var self = this;
+        // select color scheme
+        var colorScheme = this._supported_color_schemes[self.colorScheme];
+        data.columns.forEach(function (column, index) {
+          if (column.length === 2) {
+            var colorValue = colorScheme(index);
+
+            // add a td with width to the insertPoint
+            var td = document.createElement('td');
+            td.style['background-color'] = colorValue;
+            td.style['color'] = '#FFFFFF';
+            var value = column[1];
+            var textNode = document.createTextNode(value);
+            Polymer.dom(td).appendChild(textNode);
+            td.style.width = (baseWidth*value) + '%';
+            insertPoint.appendChild(td);
+
+            // debugger;
+            // add a legend entry
+            var name = column[0];
+            var entry = document.createElement('div');
+            Polymer.dom(entry).classList.add('entry');
+            var color = document.createElement('div');
+            Polymer.dom(color).classList.add('color');
+            color.style['background-color'] = colorValue;
+            Polymer.dom(entry).appendChild(color);
+            var textNode = document.createTextNode(name);
+            Polymer.dom(entry).appendChild(textNode);
+            legend.appendChild(entry);
+          } else {
+            // ignore this entry as its incomplete
+          }
+        });
+      },
+      _isArray: function(obj) {
+        return Object.prototype.toString.apply(obj) === "[object Array]";
+      },
+      _isString: function(obj) {
+        return Object.prototype.toString.apply(obj) === "[object String]";
+      }
+    });
+  </script>
+</dom-module>

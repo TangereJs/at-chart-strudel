@@ -70,6 +70,10 @@
           value: function() {
             return { "columns": [ ["Taken", 6], ["Planned", 2], ["Open", 2] ]};
           }
+        },
+        modelRoot: {
+          type: String,
+          value: ""
         }
       },
       $meta: [{
@@ -97,6 +101,32 @@
           ];
           return colors_g[n % colors_g.length];
         }
+      },
+
+      actionListener: function (event) {
+
+        if(this.modelRoot) {
+          this.data = this._getObjPath(event.detail.model, this.modelRoot);
+        } else {
+          this.data = event.detail.model.state;
+        }
+        
+      },
+
+      _getObjPath: function (obj, path) {
+
+        if (!path) return obj;
+        var paths = path.split('.'),
+          current = obj;
+
+        for (var i = 0; i < paths.length; ++i) {
+          if (current[paths[i]] == undefined) {
+            return undefined;
+          } else {
+            current = current[paths[i]];
+          }
+        }
+        return current;
       },
       ready: function() {
         // get sample data
